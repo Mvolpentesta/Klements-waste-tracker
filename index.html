@@ -1,0 +1,782 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Waste & Rework Entry — Klement's</title>
+<style>
+  :root {
+    --bg: #F0F2F5;
+    --surface: #FFFFFF;
+    --waste: #8B1A1A;
+    --waste-light: #FDF0F0;
+    --waste-mid: #F5C6C6;
+    --rework: #1A3A5C;
+    --rework-light: #EEF3F9;
+    --rework-mid: #B8CDE3;
+    --accent: #D4A017;
+    --text: #111827;
+    --text-sub: #6B7280;
+    --border: #D1D5DB;
+    --radius: 10px;
+    --success: #166534;
+    --success-bg: #DCFCE7;
+    --input-h: 50px;
+    --font: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, sans-serif;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+
+  body {
+    font-family: var(--font);
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    padding-bottom: 40px;
+  }
+
+  /* HEADER */
+  header {
+    background: var(--rework);
+    color: white;
+    padding: 14px 18px 13px;
+    position: sticky;
+    top: 0;
+    z-index: 20;
+  }
+  .header-brand { font-size: 10px; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; opacity: 0.55; margin-bottom: 2px; }
+  .header-title { font-size: 17px; font-weight: 700; letter-spacing: -0.01em; }
+  .header-sub { font-size: 11px; opacity: 0.5; margin-top: 2px; }
+
+  /* DISPOSITION TOGGLE — most important, shown first */
+  .disp-toggle-wrap {
+    padding: 14px 16px 0;
+    max-width: 480px;
+    margin: 0 auto;
+  }
+  .disp-toggle {
+    display: flex;
+    border-radius: 12px;
+    overflow: hidden;
+    border: 2px solid var(--border);
+    background: var(--surface);
+  }
+  .disp-btn {
+    flex: 1;
+    height: 58px;
+    border: none;
+    background: transparent;
+    font-family: var(--font);
+    font-size: 16px;
+    font-weight: 700;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 2px;
+    transition: background 0.15s, color 0.15s;
+    color: var(--text-sub);
+  }
+  .disp-btn .disp-icon { font-size: 18px; }
+  .disp-btn .disp-label { font-size: 13px; font-weight: 700; letter-spacing: 0.02em; }
+  .disp-btn.waste-active { background: var(--waste); color: white; }
+  .disp-btn.rework-active { background: var(--rework); color: white; }
+
+  /* TIMESTAMP */
+  .timestamp-bar {
+    max-width: 480px;
+    margin: 10px auto 0;
+    padding: 0 16px;
+  }
+  .timestamp-inner {
+    background: white;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 9px 14px;
+    font-size: 12px;
+    color: var(--text-sub);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .ts-dot { width: 7px; height: 7px; border-radius: 50%; background: #22C55E; flex-shrink: 0; animation: pulse 2s infinite; }
+  @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.4; } }
+
+  main { padding: 0 16px; max-width: 480px; margin: 0 auto; }
+
+  .section-label {
+    font-size: 10px;
+    font-weight: 800;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--text-sub);
+    margin: 18px 0 8px;
+  }
+
+  .card {
+    background: var(--surface);
+    border-radius: var(--radius);
+    border: 1px solid var(--border);
+    overflow: hidden;
+    margin-bottom: 4px;
+  }
+
+  .field {
+    padding: 12px 14px;
+    border-bottom: 1px solid #F3F4F6;
+  }
+  .field:last-child { border-bottom: none; }
+
+  .field label {
+    display: block;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.09em;
+    text-transform: uppercase;
+    color: var(--text-sub);
+    margin-bottom: 7px;
+  }
+
+  .req { color: #EF4444; margin-left: 2px; }
+
+  select, input[type="text"], input[type="number"], textarea {
+    width: 100%;
+    height: var(--input-h);
+    font-family: var(--font);
+    font-size: 16px;
+    color: var(--text);
+    background: #F9FAFB;
+    border: 1.5px solid var(--border);
+    border-radius: 8px;
+    padding: 0 14px;
+    appearance: none;
+    -webkit-appearance: none;
+    outline: none;
+    transition: border-color 0.15s, background 0.15s;
+  }
+  select:focus, input:focus, textarea:focus {
+    border-color: var(--rework);
+    background: white;
+  }
+  select {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%236B7280' stroke-width='2.5'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 14px center;
+    padding-right: 40px;
+    background-color: #F9FAFB;
+  }
+  textarea {
+    height: auto;
+    min-height: 80px;
+    padding: 12px 14px;
+    resize: none;
+    line-height: 1.5;
+  }
+
+  /* PILL GROUPS */
+  .pill-row { display: flex; gap: 8px; }
+  .pill {
+    flex: 1;
+    height: 46px;
+    border: 1.5px solid var(--border);
+    border-radius: 8px;
+    background: #F9FAFB;
+    font-family: var(--font);
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text-sub);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+    transition: all 0.12s;
+    user-select: none;
+    -webkit-user-select: none;
+  }
+  .pill.active-waste {
+    background: var(--waste-light);
+    border-color: var(--waste);
+    color: var(--waste);
+  }
+  .pill.active-rework {
+    background: var(--rework-light);
+    border-color: var(--rework);
+    color: var(--rework);
+  }
+
+  /* CATEGORY GRID */
+  .cat-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 7px;
+  }
+  .cat-btn {
+    height: 44px;
+    border: 1.5px solid var(--border);
+    border-radius: 8px;
+    background: #F9FAFB;
+    font-family: var(--font);
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text-sub);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 0 6px;
+    transition: all 0.12s;
+    user-select: none;
+    -webkit-user-select: none;
+    line-height: 1.2;
+  }
+  .cat-btn.active-waste {
+    background: var(--waste-light);
+    border-color: var(--waste);
+    color: var(--waste);
+    font-weight: 700;
+  }
+  .cat-btn.active-rework {
+    background: var(--rework-light);
+    border-color: var(--rework);
+    color: var(--rework);
+    font-weight: 700;
+  }
+
+  /* LBS ROW */
+  .lbs-row { display: flex; align-items: center; gap: 10px; }
+  .lbs-row input { flex: 1; }
+  .lbs-unit { font-size: 15px; font-weight: 700; color: var(--text-sub); flex-shrink: 0; }
+
+  /* SUBMIT */
+  .submit-area {
+    padding: 20px 16px 0;
+    max-width: 480px;
+    margin: 0 auto;
+  }
+  .error-banner {
+    background: #FEF2F2;
+    border: 1px solid #FECACA;
+    border-radius: 8px;
+    padding: 10px 14px;
+    font-size: 13px;
+    color: #DC2626;
+    margin-bottom: 12px;
+    display: none;
+    line-height: 1.5;
+  }
+  .submit-btn {
+    width: 100%;
+    height: 56px;
+    border: none;
+    border-radius: var(--radius);
+    font-family: var(--font);
+    font-size: 17px;
+    font-weight: 700;
+    color: white;
+    cursor: pointer;
+    transition: opacity 0.15s, transform 0.1s;
+    letter-spacing: -0.01em;
+  }
+  .submit-btn:active { transform: scale(0.98); opacity: 0.85; }
+  .submit-btn.waste-btn { background: var(--waste); }
+  .submit-btn.rework-btn { background: var(--rework); }
+  .submit-note {
+    text-align: center;
+    font-size: 11px;
+    color: var(--text-sub);
+    margin-top: 9px;
+    line-height: 1.5;
+  }
+
+  /* SUCCESS */
+  .success-screen {
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    padding: 48px 24px 40px;
+    max-width: 480px;
+    margin: 0 auto;
+  }
+  .success-icon {
+    width: 68px; height: 68px;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 32px;
+    margin-bottom: 18px;
+  }
+  .success-icon.waste-icon { background: var(--waste-light); }
+  .success-icon.rework-icon { background: var(--rework-light); }
+  .success-title { font-size: 21px; font-weight: 800; margin-bottom: 6px; }
+  .success-title.waste-title { color: var(--waste); }
+  .success-title.rework-title { color: var(--rework); }
+  .success-detail { font-size: 14px; color: var(--text-sub); line-height: 1.6; margin-bottom: 8px; }
+  .success-ref { font-size: 11px; color: var(--text-sub); background: var(--bg); border-radius: 7px; padding: 7px 14px; margin-bottom: 26px; font-family: monospace; letter-spacing: 0.03em; }
+  .add-another-btn {
+    width: 100%;
+    height: 52px;
+    border: none;
+    border-radius: var(--radius);
+    font-family: var(--font);
+    font-size: 16px;
+    font-weight: 700;
+    color: white;
+    cursor: pointer;
+    margin-bottom: 10px;
+  }
+  .add-another-btn.waste-btn2 { background: var(--waste); }
+  .add-another-btn.rework-btn2 { background: var(--rework); }
+  .switch-type-btn {
+    width: 100%;
+    height: 46px;
+    background: transparent;
+    border: 1.5px solid var(--border);
+    border-radius: var(--radius);
+    font-family: var(--font);
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text-sub);
+    cursor: pointer;
+  }
+
+  .form-wrap { display: block; }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-brand">Klement's — Plant Floor</div>
+  <div class="header-title">Waste &amp; Rework Log</div>
+  <div class="header-sub">Entries are permanent · Add-only access</div>
+</header>
+
+<div class="form-wrap" id="form-wrap">
+
+  <!-- DISPOSITION FIRST -->
+  <div class="disp-toggle-wrap">
+    <div class="disp-toggle">
+      <button class="disp-btn" id="btn-waste" onclick="setDisposition('Waste')">
+        <span class="disp-icon">🗑️</span>
+        <span class="disp-label">WASTE</span>
+      </button>
+      <button class="disp-btn" id="btn-rework" onclick="setDisposition('Rework')">
+        <span class="disp-icon">🔄</span>
+        <span class="disp-label">REWORK</span>
+      </button>
+    </div>
+  </div>
+
+  <div class="timestamp-bar">
+    <div class="timestamp-inner">
+      <div class="ts-dot"></div>
+      <span id="live-ts">Loading…</span>
+    </div>
+  </div>
+
+  <main>
+
+    <!-- WHO -->
+    <div class="section-label">Who are you?</div>
+    <div class="card">
+      <div class="field">
+        <label>Your name<span class="req">*</span></label>
+        <select id="sel-user">
+          <option value="">Select name…</option>
+          <option>CLARA</option>
+          <option>JIMENA</option>
+          <option>JAIME</option>
+          <option>DAISY</option>
+          <option>TREBLE</option>
+          <option>LISМARY</option>
+          <option>ESTEBAN</option>
+          <option>MARCELA</option>
+          <option>MICHAEL</option>
+          <option>MARYCELA</option>
+          <option>RT</option>
+          <option>JE</option>
+          <option>RUBEN</option>
+          <option>LEOVANNI</option>
+          <option>CARLOS</option>
+          <option>AGUIEL</option>
+          <option>MARLIN</option>
+          <option>JUAN</option>
+          <option>LUIS</option>
+          <option>ALEJANDRO</option>
+          <option>SAM</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- SHIFT & DEPT -->
+    <div class="section-label">Shift &amp; department</div>
+    <div class="card">
+      <div class="field">
+        <label>Shift<span class="req">*</span></label>
+        <div class="pill-row" id="shift-pills">
+          <div class="pill" data-val="1" onclick="selectShift(this)">☀ Shift 1</div>
+          <div class="pill" data-val="2" onclick="selectShift(this)">🌙 Shift 2</div>
+        </div>
+      </div>
+      <div class="field">
+        <label>Department<span class="req">*</span></label>
+        <select id="sel-dept">
+          <option value="">Select department…</option>
+          <option>Packaging</option>
+          <option>Formulation</option>
+          <option>Kitchen</option>
+          <option>Smokehouse</option>
+          <option>QA</option>
+          <option>Warehouse</option>
+        </select>
+      </div>
+      <div class="field" id="location-field">
+        <label>Location (optional)</label>
+        <select id="sel-location">
+          <option value="">Select location…</option>
+          <option>mixer 1</option>
+          <option>mixer 2</option>
+          <option>mixer 3</option>
+          <option>grinder 1</option>
+          <option>grinder 2</option>
+          <option>grinder 3</option>
+          <option>Emulsifier</option>
+          <option>Inspection Table</option>
+          <option>Big Frozen Grinder</option>
+          <option>Small Frozen Grinder</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- PRODUCT & BATCH -->
+    <div class="section-label">Product &amp; batch</div>
+    <div class="card">
+      <div class="field">
+        <label>Product / Material #<span class="req">*</span></label>
+        <input type="text" id="inp-product" placeholder="e.g. 66910" autocomplete="off" autocorrect="off" spellcheck="false" inputmode="numeric">
+      </div>
+      <div class="field">
+        <label>Batch #<span class="req">*</span></label>
+        <input type="text" id="inp-batch" placeholder="e.g. 91841" autocomplete="off" autocorrect="off" spellcheck="false" inputmode="numeric">
+      </div>
+    </div>
+
+    <!-- CATEGORY -->
+    <div class="section-label" id="cat-label">Category<span class="req">*</span></div>
+    <div class="card">
+      <div class="field">
+        <div class="cat-grid" id="cat-grid">
+          <!-- Filled by JS based on disposition -->
+        </div>
+      </div>
+    </div>
+
+    <!-- LBS -->
+    <div class="section-label">Weight</div>
+    <div class="card">
+      <div class="field">
+        <label>LBS<span class="req">*</span></label>
+        <div class="lbs-row">
+          <input type="number" id="inp-lbs" placeholder="0" min="0" step="1" inputmode="decimal">
+          <span class="lbs-unit">lbs</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- LBS CONSUMED (Rework only) -->
+    <div id="lbs-consumed-section" style="display:none;">
+      <div class="section-label">Lbs consumed (if applicable)</div>
+      <div class="card">
+        <div class="field">
+          <label>Lbs consumed</label>
+          <div class="lbs-row">
+            <input type="number" id="inp-consumed" placeholder="0" min="0" step="1" inputmode="decimal">
+            <span class="lbs-unit">lbs</span>
+          </div>
+        </div>
+        <div class="field">
+          <label>Comment (e.g. batch it was reworked into)</label>
+          <input type="text" id="inp-comment" placeholder="e.g. 66910/91829" autocomplete="off" autocorrect="off" spellcheck="false">
+        </div>
+      </div>
+    </div>
+
+    <!-- COMMENT (Waste only) -->
+    <div id="waste-comment-section" style="display:none;">
+      <div class="section-label">Comment (optional)</div>
+      <div class="card">
+        <div class="field">
+          <textarea id="inp-waste-comment" placeholder="Any additional notes…" rows="3"></textarea>
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+  <div class="submit-area">
+    <div class="error-banner" id="error-banner"></div>
+    <button class="submit-btn" id="submit-btn" onclick="submitEntry()">
+      Select Waste or Rework above
+    </button>
+    <p class="submit-note">Entries are permanent and cannot be edited after submission.</p>
+  </div>
+</div>
+
+<!-- SUCCESS SCREEN -->
+<div class="success-screen" id="success-screen">
+  <div class="success-icon" id="succ-icon"></div>
+  <div class="success-title" id="succ-title"></div>
+  <div class="success-detail" id="succ-detail"></div>
+  <div class="success-ref" id="succ-ref"></div>
+  <button class="add-another-btn" id="add-another-btn" onclick="resetForm()">Add another entry</button>
+  <button class="switch-type-btn" id="switch-type-btn" onclick="switchAndReset()"></button>
+</div>
+
+<script>
+const WASTE_CATS = [
+  'Dropped','Washout','End Of Run','Bone Collection','Changeover',
+  'Foreign Material','Leaker Checks','Aged','No Identification',
+  'Chemistry','Cutting / Peeling','QA','Allergen Contamination',
+  'High Ph','Oven Failure','Vendor Problem','Process Failure','Color'
+];
+const REWORK_CATS = [
+  'Color','No Twist','Peeler Damage','Damaged','Cut Ends',
+  'Cutting / Peeling','Weight','Wrinkles','Grease Out','Rework','Foreign Material'
+];
+
+let disposition = '';
+let selectedShift = '';
+let selectedCat = '';
+
+function updateTimestamp() {
+  const now = new Date();
+  document.getElementById('live-ts').textContent =
+    now.toLocaleString('en-US', { weekday:'short', month:'short', day:'numeric',
+      hour:'2-digit', minute:'2-digit', second:'2-digit' });
+}
+updateTimestamp();
+setInterval(updateTimestamp, 1000);
+
+function setDisposition(disp) {
+  disposition = disp;
+  selectedCat = '';
+
+  const isWaste = disp === 'Waste';
+  const bWaste = document.getElementById('btn-waste');
+  const bRework = document.getElementById('btn-rework');
+  bWaste.className = 'disp-btn' + (isWaste ? ' waste-active' : '');
+  bRework.className = 'disp-btn' + (!isWaste ? ' rework-active' : '');
+
+  // update shift pills color
+  document.querySelectorAll('#shift-pills .pill').forEach(p => {
+    if (p.dataset.selected === '1') {
+      p.className = 'pill ' + (isWaste ? 'active-waste' : 'active-rework');
+    }
+  });
+
+  // rebuild category grid
+  buildCatGrid(isWaste ? WASTE_CATS : REWORK_CATS, isWaste);
+
+  // show/hide sections
+  document.getElementById('lbs-consumed-section').style.display = isWaste ? 'none' : 'block';
+  document.getElementById('waste-comment-section').style.display = isWaste ? 'block' : 'none';
+
+  // update submit button
+  const btn = document.getElementById('submit-btn');
+  btn.className = 'submit-btn ' + (isWaste ? 'waste-btn' : 'rework-btn');
+  btn.textContent = 'Submit ' + disp + ' entry';
+
+  clearError();
+}
+
+function buildCatGrid(cats, isWaste) {
+  const grid = document.getElementById('cat-grid');
+  grid.innerHTML = '';
+  cats.forEach(c => {
+    const b = document.createElement('button');
+    b.className = 'cat-btn';
+    b.textContent = c;
+    b.dataset.val = c;
+    b.onclick = function() { selectCat(this, isWaste); };
+    grid.appendChild(b);
+  });
+}
+
+function selectCat(el, isWaste) {
+  document.querySelectorAll('.cat-btn').forEach(b => b.className = 'cat-btn');
+  el.classList.add(isWaste ? 'active-waste' : 'active-rework');
+  selectedCat = el.dataset.val;
+}
+
+function selectShift(el) {
+  document.querySelectorAll('#shift-pills .pill').forEach(p => {
+    p.className = 'pill';
+    p.dataset.selected = '0';
+  });
+  el.className = 'pill ' + (disposition === 'Waste' ? 'active-waste' : disposition === 'Rework' ? 'active-rework' : 'active-rework');
+  el.dataset.selected = '1';
+  selectedShift = el.dataset.val;
+}
+
+function generateRef() {
+  const now = new Date();
+  const pad = n => String(n).padStart(2,'0');
+  const prefix = disposition === 'Waste' ? 'WST' : 'RWK';
+  return prefix + '-' + String(now.getFullYear()).slice(2) + pad(now.getMonth()+1) + pad(now.getDate()) +
+    '-' + pad(now.getHours()) + pad(now.getMinutes()) + pad(now.getSeconds());
+}
+
+function showError(msg) {
+  const b = document.getElementById('error-banner');
+  b.textContent = msg;
+  b.style.display = 'block';
+  b.scrollIntoView({ behavior: 'smooth', block: 'center' });
+}
+function clearError() {
+  const b = document.getElementById('error-banner');
+  b.style.display = 'none';
+  b.textContent = '';
+}
+
+async function submitEntry() {
+  clearError();
+  if (!disposition) return showError('Please select Waste or Rework at the top.');
+
+  const user = document.getElementById('sel-user').value;
+  const dept = document.getElementById('sel-dept').value;
+  const location = document.getElementById('sel-location').value;
+  const product = document.getElementById('inp-product').value.trim();
+  const batch = document.getElementById('inp-batch').value.trim();
+  const lbsRaw = document.getElementById('inp-lbs').value;
+  const lbs = parseFloat(lbsRaw);
+
+  if (!user) return showError('Please select your name.');
+  if (!selectedShift) return showError('Please select your shift.');
+  if (!dept) return showError('Please select a department.');
+  if (!product) return showError('Please enter a product / material number.');
+  if (!batch) return showError('Please enter a batch number.');
+  if (!selectedCat) return showError('Please select a category.');
+  if (!lbsRaw || isNaN(lbs) || lbs <= 0) return showError('Please enter a valid LBS amount.');
+
+  const now = new Date();
+  const ref = generateRef();
+  const isWaste = disposition === 'Waste';
+
+  // Build the row matching the WasteLog 14-column structure:
+  // Entry Date | User | Department | Location | Shift | Product/Material | Batch | Category | LBS | Lbs Consumed | Comment | Entered Date/Time | Disposition | Red Flag
+  const lbsConsumed = isWaste ? 'x' : (document.getElementById('inp-consumed').value || '');
+  const comment = isWaste
+    ? document.getElementById('inp-waste-comment').value.trim()
+    : document.getElementById('inp-comment').value.trim();
+
+  const entryRow = {
+    ref,
+    entryDate: now.toLocaleDateString('en-US'),
+    user,
+    department: dept,
+    location,
+    shift: selectedShift,
+    product,
+    batch,
+    category: selectedCat,
+    lbs,
+    lbsConsumed,
+    comment,
+    enteredAt: now.toISOString(),
+    disposition
+  };
+
+  // SEND TO POWER AUTOMATE
+  // Paste your Power Automate HTTP trigger URL below after completing setup
+  const FLOW_URL = 'PASTE_YOUR_POWER_AUTOMATE_URL_HERE';
+
+  if (FLOW_URL === 'PASTE_YOUR_POWER_AUTOMATE_URL_HERE') {
+    // Dev mode: just log to console until URL is configured
+    console.log('KLEMENTS ENTRY (dev mode):', JSON.stringify(entryRow, null, 2));
+  } else {
+    try {
+      const response = await fetch(FLOW_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(entryRow)
+      });
+      if (!response.ok) throw new Error('Flow returned ' + response.status);
+    } catch (err) {
+      console.error('Submission error:', err);
+      showError('Submission failed. Check your connection and try again.');
+      return;
+    }
+  }
+
+  // SHOW SUCCESS
+  document.getElementById('form-wrap').style.display = 'none';
+  const ss = document.getElementById('success-screen');
+  ss.style.display = 'flex';
+
+  document.getElementById('succ-icon').className = 'success-icon ' + (isWaste ? 'waste-icon' : 'rework-icon');
+  document.getElementById('succ-icon').textContent = isWaste ? '🗑️' : '🔄';
+  document.getElementById('succ-title').className = 'success-title ' + (isWaste ? 'waste-title' : 'rework-title');
+  document.getElementById('succ-title').textContent = disposition + ' entry recorded';
+  document.getElementById('succ-detail').textContent =
+    lbs + ' lbs · ' + selectedCat + ' · ' + dept + ' · Shift ' + selectedShift + ' · ' + user;
+  document.getElementById('succ-ref').textContent = ref + ' · ' + now.toLocaleString('en-US', { month:'short', day:'numeric', hour:'2-digit', minute:'2-digit' });
+
+  const addBtn = document.getElementById('add-another-btn');
+  addBtn.className = 'add-another-btn ' + (isWaste ? 'waste-btn2' : 'rework-btn2');
+  addBtn.textContent = 'Add another ' + disposition.toLowerCase() + ' entry';
+
+  const switchBtn = document.getElementById('switch-type-btn');
+  switchBtn.textContent = 'Switch to ' + (isWaste ? 'Rework' : 'Waste') + ' entry';
+  switchBtn.dataset.switchTo = isWaste ? 'Rework' : 'Waste';
+}
+
+function resetForm() {
+  document.getElementById('sel-user').value = '';
+  document.getElementById('sel-dept').value = '';
+  document.getElementById('sel-location').value = '';
+  document.getElementById('inp-product').value = '';
+  document.getElementById('inp-batch').value = '';
+  document.getElementById('inp-lbs').value = '';
+  document.getElementById('inp-consumed').value = '';
+  document.getElementById('inp-comment').value = '';
+  document.getElementById('inp-waste-comment').value = '';
+  document.querySelectorAll('#shift-pills .pill').forEach(p => { p.className = 'pill'; p.dataset.selected = '0'; });
+  document.querySelectorAll('.cat-btn').forEach(b => b.className = 'cat-btn');
+  selectedShift = '';
+  selectedCat = '';
+  clearError();
+
+  const keepDisp = disposition;
+  document.getElementById('success-screen').style.display = 'none';
+  document.getElementById('form-wrap').style.display = 'block';
+  setDisposition(keepDisp);
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function switchAndReset() {
+  const btn = document.getElementById('switch-type-btn');
+  const newDisp = btn.dataset.switchTo;
+  document.getElementById('sel-user').value = '';
+  document.getElementById('sel-dept').value = '';
+  document.getElementById('sel-location').value = '';
+  document.getElementById('inp-product').value = '';
+  document.getElementById('inp-batch').value = '';
+  document.getElementById('inp-lbs').value = '';
+  document.getElementById('inp-consumed').value = '';
+  document.getElementById('inp-comment').value = '';
+  document.getElementById('inp-waste-comment').value = '';
+  document.querySelectorAll('#shift-pills .pill').forEach(p => { p.className = 'pill'; p.dataset.selected = '0'; });
+  selectedShift = '';
+  selectedCat = '';
+  clearError();
+
+  document.getElementById('success-screen').style.display = 'none';
+  document.getElementById('form-wrap').style.display = 'block';
+  setDisposition(newDisp);
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+</script>
+</body>
+</html>
